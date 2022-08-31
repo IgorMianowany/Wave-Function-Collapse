@@ -16,6 +16,8 @@ public class Tile {
     private int rightConnector;
     private int leftConnector;
     private int downConnector;
+    private boolean isCollapsed = false;
+    private boolean isLimited = false;
 
     private final List<ImageView> originalOptions = new ArrayList<>();
     private List<ImageView> currentOptions = new ArrayList<>();
@@ -89,6 +91,14 @@ public class Tile {
         this.downConnector = downConnector;
     }
 
+    public boolean isCollapsed() {
+        return isCollapsed;
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        isCollapsed = collapsed;
+    }
+
     private void setChoice(int choice) {
         this.choice = originalOptions.get(choice);
         switch (choice){
@@ -129,13 +139,19 @@ public class Tile {
         Random random = new Random();
         ImageView chosen = currentOptions.get(random.nextInt(0, currentOptions.size()));
         setChoice(originalOptions.indexOf(chosen));
+        this.setCollapsed(true);
     }
 
     public void limitOptions(List<ImageView> optionsToRemove){
         currentOptions.removeAll(optionsToRemove);
+        this.isLimited = true;
     }
 
     public List<ImageView> getCurrentOptions() {
         return currentOptions;
+    }
+
+    public boolean isLimited() {
+        return isLimited;
     }
 }
