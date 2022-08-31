@@ -30,21 +30,12 @@ public class TileManager {
     }
 
     public void collapse(){
-        List<ImageView> optionsToRemove = new ArrayList<>();
-        List<ImageView> originalOptions = tiles[0][0].getOriginalOptions();
-
-        optionsToRemove.add(originalOptions.get(2));
-
-        tiles[0][0].limitOptions(optionsToRemove);
-        tiles[0][0].collapse();
-
-        optionsToRemove.clear();
         limitEntropy();
-        tilesLeft[0][0] = null;
-
         for(int i = 0; i<5;i++){
             for(int j = 0; j<5; j++){
-                findLowestEntropyTile().collapse();
+                if(!(j==4 && i == 4)){
+                    findLowestEntropyTile().collapse();
+                }
             }
         }
     }
@@ -56,20 +47,23 @@ public class TileManager {
             for(int j = 0; j<5; j++){
                 if(!tiles[j][i].isCollapsed() && tiles[j][i].getCurrentOptions().size() < lowestEntropyTileEntropy){
                     toCollapse.add(tiles[j][i]);
-                    System.out.println("Adding to toCollapse tile on: (" + j + ";" + i + ")" );
                     lowestEntropyTileEntropy = tiles[j][i].getCurrentOptions().size();
                     lowestEntropyTileX = j;
                     lowestEntropyTileY = i;
                 }
             }
        }
-       System.out.println("toCollapse size: " + toCollapse.size());
-        if(toCollapse.size()>0){
-            return toCollapse.get(new Random().nextInt(0, toCollapse.size()));
-        }
-        else{
-            return tiles[lowestEntropyTileX][lowestEntropyTileY];
-        }
+       toCollapse.forEach(tile -> {
+           if(tile.isCollapsed()){
+               toCollapse.remove(tile);
+           }
+       });
+       if(toCollapse.size()>0){
+           return toCollapse.get(new Random().nextInt(0, toCollapse.size()));
+       }
+       else{
+           return tiles[lowestEntropyTileX][lowestEntropyTileY];
+       }
    }
 
     public void limitEntropy(){
@@ -78,7 +72,7 @@ public class TileManager {
         List<ImageView> originalOptions;
         for(int i = 0; i<5;i++){
             for(int j = 0; j<5; j++){
-                if(!tiles[j][i].isLimited()){
+                if(!tiles[j][i].isCollapsed()){
                     if(j>0){
                         if(i==0){
                             if(tiles[j-1][i].getRightConnector() == 1){
@@ -130,9 +124,13 @@ public class TileManager {
                                 optionsToRemove.add(originalOptions.get(1));
                             }
                         }
-
+                        else{
+                            originalOptions = tiles[j][i].getOriginalOptions();
+                            optionsToRemove.add(originalOptions.get(2));
+                        }
                     }
                     tiles[j][i].limitOptions(optionsToRemove);
+                    tiles[j][i].collapse();
                     optionsToRemove.clear();
                 }
             }

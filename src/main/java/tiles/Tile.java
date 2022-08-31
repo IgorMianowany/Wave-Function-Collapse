@@ -1,7 +1,9 @@
 package tiles;
 
+import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import tileconsts.Tiles;
 
 import javax.crypto.spec.OAEPParameterSpec;
@@ -17,11 +19,9 @@ public class Tile {
     private int leftConnector;
     private int downConnector;
     private boolean isCollapsed = false;
-    private boolean isLimited = false;
 
     private final List<ImageView> originalOptions = new ArrayList<>();
     private List<ImageView> currentOptions = new ArrayList<>();
-    private final List<ImageView> images = new ArrayList<>();
 
     public Tile() {
         ImageView imageView1 = new ImageView(new Image(Tiles.CORNER));
@@ -50,6 +50,7 @@ public class Tile {
 
         setChoice(2);
     }
+
 
     public List<ImageView> getOriginalOptions() {
         return originalOptions;
@@ -133,25 +134,26 @@ public class Tile {
                 setLeftConnector(1);
             }
         }
+        this.choice.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> System.out.println(currentOptions.size() + ", is collapsed?: " + isCollapsed));
     }
 
     public void collapse(){
-        Random random = new Random();
-        ImageView chosen = currentOptions.get(random.nextInt(0, currentOptions.size()));
-        setChoice(originalOptions.indexOf(chosen));
-        this.setCollapsed(true);
+        if(!this.isCollapsed){
+            Random random = new Random();
+            ImageView chosen = currentOptions.get(random.nextInt(0, currentOptions.size()));
+            while(currentOptions.size()>0){
+                currentOptions.remove(0);
+            }
+            setChoice(originalOptions.indexOf(chosen));
+            this.setCollapsed(true);
+        }
     }
 
     public void limitOptions(List<ImageView> optionsToRemove){
         currentOptions.removeAll(optionsToRemove);
-        this.isLimited = true;
     }
 
     public List<ImageView> getCurrentOptions() {
         return currentOptions;
-    }
-
-    public boolean isLimited() {
-        return isLimited;
     }
 }

@@ -40,6 +40,7 @@ public class GUI extends Application {
 
 
 
+
         Scene scene = new Scene(grid, 1000, 800);
         stage.setTitle("WFC!");
         stage.setScene(scene);
